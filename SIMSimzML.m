@@ -1,4 +1,4 @@
-classdef SIMSimzML < readimzML & extractFeatures
+classdef SIMSimzML < readimzML & extractFeatures & customisePlot
     % Parsing .imzML files exported from Surface Lab for generating ion
     % images and performing multivariate analysis on mass spectrometry
     % imaging data
@@ -21,34 +21,52 @@ classdef SIMSimzML < readimzML & extractFeatures
        mvaType = 'NMF'
        normalisedIntensity
        components = 2;
+       selectedFile
        selectedMZ
     end
     
     methods
+        
+        function obj = selectFile(obj)
+           clc
+           for j = 1:length(obj.files)
+               fprintf('(%d) %s \n',j,obj.files{j});
+           end
+           obj.selectedFile = input('Select file: ');
+        end
+        
         function obj = normalise(obj)
-            normInt = [];
-            if iscell(obj.totIonCount)
-                obj.totIonCount = cell2mat(obj.totIonCount);
-            end
-            
-            for j = 1:size(obj.featureList,2)
-                normInt(:,j) = obj.featureList(:,j)./obj.totIonCount(j,1);
+            normInt = [];            
+            tempTIC = obj.totIonCount{obj.selectedFile};
+            tempTIC = cell2mat(tempTIC);
+            tempFeatures = obj.featureList{obj.selectedFile};
+            for j = 1:size(tempFeatures,2)
+                normInt(:,j) = tempFeatures(:,j)./tempTIC(j,1);
             end
             obj.normalisedIntensity = normInt'; 
         end
         
         function obj = selectMZ(obj)
             clc
-            for j = 1:length(obj.uniqueFeatures)
-                fprintf('(%d) m/z %.4f \n',j,obj.uniqueFeatures(j));
+            tempFeatures = obj.uniqueFeatures{obj.selectedFile};
+            for j = 1:length(tempFeatures)
+                fprintf('(%d) m/z %.4f \n',j,tempFeatures(j));
             end
             obj.selectedMZ = input('Select row number: ');
         end
         
-        function obj = ionImages(obj)
+        function obj = ionImage(obj)
            if isempty(obj.selectedMZ)
-               warning('No m/z value selected. ');
+               warning('No m/z value selected. Executing selectedMZ');
+               obj = selectMZ(obj);
            end
+           reconstructedIntensities = reshape(obj.normalisedIntensity(:,obj.selectedMZ),...
+               obj.pixelRows,obj.pixelColumns);
+           colormap(obj.CMAP);
+           imagesc(reconstructedIntensities);
+           xlabel(obj.XLabel);
+           ylabel(obj.YLabel);
+           colorbar();
         end
         
         function obj = multivariate(obj)
@@ -62,12 +80,12 @@ classdef SIMSimzML < readimzML & extractFeatures
             for j = 1:obj.components
                 f = figure;
                 endmemberImage = reshape(W(:,j),obj.pixelRows,obj.pixelColumns);
-                colormap(hot);
+                colormap(obj.CMAP);
                 imagesc(endmemberImage)
                 colorbar();
                 title(sprintf('Endmember %d',j));
-                xlabel('X');
-                ylabel('Y');
+                xlabel(obj.XLabel);
+                ylabel(obj.XLabel);
                 set(gcf,'Color','white');
             end
         end
