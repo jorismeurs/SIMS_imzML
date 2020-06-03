@@ -75,7 +75,7 @@ classdef readimzML
                         tempTIC{count,1} = sum(int);
                     end
                end
-               obj.totIonCount = tempTIC;
+               obj.totIonCount{j} = tempTIC;
                obj.spectra{j} = tempSpectra;
             end
             fprintf('Parsing completed \n');
