@@ -1,4 +1,4 @@
-classdef readimzML
+classdef readimzML < customisePlot
     %READIMZML uses the Java classes from the imzML Converter [1] to parse 
     % imzML files into MATLAB
     %
@@ -127,6 +127,21 @@ classdef readimzML
                    end 
                 end
             end
+        end
+        
+        function checkImage(obj)
+            fileToCheck = input('Select file: ');
+            try
+               fileTIC = cell2mat(obj.totIonCount{fileToCheck}); 
+            catch e
+               rethrow(e)
+            end
+            reconstructedImage = reshape(fileTIC,obj.pixelRows,obj.pixelColumns);
+            colormap(obj.CMAP)
+            imagesc(reconstructedImage);
+            xlabel(obj.XLabel);
+            ylabel(obj.YLabel);
+            colorbar();
         end
     end
     
