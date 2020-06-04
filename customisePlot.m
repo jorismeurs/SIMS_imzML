@@ -10,6 +10,7 @@ classdef customisePlot
         XTick
         YTick
         CMAPval = 'hot'
+        fontName = 'Calibri'
     end
     
     methods
