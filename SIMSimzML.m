@@ -11,7 +11,7 @@ classdef SIMSimzML < readimzML & extractFeatures & customisePlot
     % - Statistics & Machine Learning Toolbox
     
     properties 
-        version = '0.0.2'
+        version = '0.0.3'
         developer = 'Joris Meurs, MSc'
         matlabVersion = 'R2017a'
         dependencies = {'Bioinformatics Toolbox','Statistics & Machine Learning Toolbox'}
@@ -36,14 +36,13 @@ classdef SIMSimzML < readimzML & extractFeatures & customisePlot
         end
         
         function obj = normalise(obj)
-            normInt = [];            
-            tempTIC = obj.totIonCount{obj.selectedFile};
-            tempTIC = cell2mat(tempTIC);
+            clc
+            obj.normalisedIntensity = [];            
+            tempTIC = cell2mat(obj.totIonCount{obj.selectedFile});
             tempFeatures = obj.featureList{obj.selectedFile};
             for j = 1:size(tempFeatures,2)
-                normInt(:,j) = tempFeatures(:,j)./tempTIC(j,1);
+                obj.normalisedIntensity(:,j) = tempFeatures(:,j)./tempTIC(j,1);
             end
-            obj.normalisedIntensity = normInt'; 
         end
         
         function obj = selectMZ(obj)
@@ -56,17 +55,22 @@ classdef SIMSimzML < readimzML & extractFeatures & customisePlot
         end
         
         function obj = ionImage(obj)
+           clc
            if isempty(obj.selectedMZ)
                warning('No m/z value selected. Executing selectedMZ');
                obj = selectMZ(obj);
            end
-           reconstructedIntensities = reshape(obj.normalisedIntensity(:,obj.selectedMZ),...
-               obj.pixelRows,obj.pixelColumns);
-           colormap(obj.CMAP);
-           imagesc(reconstructedIntensities);
-           xlabel(obj.XLabel);
-           ylabel(obj.YLabel);
-           colorbar();
+           try
+               reconstructedIntensities = reshape(obj.normalisedIntensity(obj.selectedMZ,:),...
+                   obj.pixelRows,obj.pixelColumns);
+               colormap(obj.CMAP);
+               imagesc(reconstructedIntensities);
+               xlabel(obj.XLabel);
+               ylabel(obj.YLabel);
+               colorbar();
+           catch e
+               rethrow(e)
+           end
         end
         
         function obj = multivariate(obj)
