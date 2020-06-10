@@ -21,37 +21,26 @@ classdef SIMSimzML < readimzML & extractFeatures & customisePlot
        mvaType = 'NMF'
        normalisedIntensity
        components = 2;
-       selectedFile
        selectedMZ
     end
     
     methods
         
-        function obj = selectFile(obj)
-           clc
-           for j = 1:length(obj.files)
-               fprintf('(%d) %s \n',j,obj.files{j});
-           end
-           obj.selectedFile = input('Select file: ');
-        end
-        
         function obj = normalise(obj)
             clc
-            obj.normalisedIntensity = [];            
-            tempTIC = cell2mat(obj.totIonCount{obj.selectedFile});
-            tempFeatures = obj.featureList{obj.selectedFile};
-            for j = 1:size(tempFeatures,2)
-                obj.normalisedIntensity(:,j) = tempFeatures(:,j)./tempTIC(j,1);
+            obj.normalisedIntensity = [];    
+            for j = 1:length(obj.spectra)
+                tempTIC = cell2mat(obj.totIonCount{j});
+                tempFeatures = obj.featureList{j};
+                for n = 1:size(tempFeatures,2)
+                    normInt(:,n) = tempFeatures(:,n)./tempTIC(n,1);
+                end
+            obj.normalisedIntensity{j} = normInt;
             end
         end
         
         function obj = selectMZ(obj)
-            clc
-            tempFeatures = obj.uniqueFeatures{obj.selectedFile};
-            for j = 1:length(tempFeatures)
-                fprintf('(%d) m/z %.4f \n',j,tempFeatures(j));
-            end
-            obj.selectedMZ = input('Select row number: ');
+            obj.selectedMZ = input('Enter m/z value: ');
         end
         
         function obj = ionImage(obj)
@@ -61,13 +50,15 @@ classdef SIMSimzML < readimzML & extractFeatures & customisePlot
                obj = selectMZ(obj);
            end
            try
-               reconstructedIntensities = reshape(obj.normalisedIntensity(obj.selectedMZ,:),...
-                   obj.pixelRows,obj.pixelColumns);
-               colormap(obj.CMAP);
-               imagesc(reconstructedIntensities);
-               xlabel(obj.XLabel);
-               ylabel(obj.YLabel);
-               colorbar();
+               for j = 1:length(obj.spectra) 
+                   reconstructedIntensities = reshape(obj.normalisedIntensity(obj.selectedMZ,:),...
+                       obj.pixelRows,obj.pixelColumns);
+                   colormap(obj.CMAP);
+                   imagesc(reconstructedIntensities);
+                   xlabel(obj.XLabel);
+                   ylabel(obj.YLabel);
+                   colorbar();
+               end
            catch e
                rethrow(e)
            end
