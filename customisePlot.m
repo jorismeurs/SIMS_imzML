@@ -9,6 +9,8 @@ classdef customisePlot
         YLabel = 'Y'
         XTick
         YTick
+        XTickLabels
+        YTickLabels
         CMAPval = 'hot'
         fontName = 'Calibri'
     end
