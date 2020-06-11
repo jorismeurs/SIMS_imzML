@@ -9,7 +9,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
     % - Statistics & Machine Learning Toolbox
     
     properties 
-        version = '0.0.7'
+        version = '0.0.8'
         developer = 'Joris Meurs, MSc'
         matlabVersion = 'R2017a'
         dependencies = {'Bioinformatics Toolbox'}
@@ -30,6 +30,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
             obj.options.tolerance = 0.001;
             obj.options.featureSelection = 'peaks';
             obj.options.thresholdIntensity = 1000;
+            obj.options.title = 'false';
         end
         
         function obj = selectFile(obj)
@@ -46,18 +47,11 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
         end
         
         function obj = ionImage(obj)
-           clc
-           if isempty(obj.mz)
-               warning('No m/z value selected');
-               return
-           end
 
            if isequal(obj.options.plotimages,'all')
-               for j = 1:length(obj.spectra)
-                  spectralData = obj.spectra{j};
-                  fileTIC = cell2mat(obj.totIonCount{j});
-                  mzInt = constructImage(obj,spectralData,fileTIC);                
-                  figure(j)
+               for j = 1:length(obj.files)
+                  mzInt = constructImage(obj,j);                
+                  f = figure;
                   reconstructedIntensities = reshape(mzInt,...
                   obj.pixelRows,obj.pixelColumns);
                   colormap(obj.CMAP);
@@ -65,34 +59,52 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
                   drawnow;
                   setPlot(obj,j)  
                   if isequal(obj.options.saveimage,'true')
-                      
+                      currentFolder = cd;
+                      exportFolder = [cd '\images\'];
+                      if ~exist(exportFolder,'dir')
+                         mkdir images
+                      end
+                      try
+                        saveas(f,[currentFolder '\images\' obj.files{j} '.tif']);
+                      catch
+                        saveas(f,[currentFolder '\images\' obj.files '.tif']);  
+                      end
                   end
+                  close(f);
                end
            end
         end
         
-        function mzInt = constructImage(obj)
-
+        function mzInt = constructImage(obj,iteration)
+           if isempty(obj.mz)
+               warning('No m/z value input');
+               return
+           end
            if isequal(obj.options.featureSelection,'peaks')
               mzInt = []; 
-              for n = 1:length(obj.uniqueFeatures)
-                 clc
-                 pixelMS = cell2mat(obj.uniqueFeatures(n)); 
-                 for k = 1:length(pixelMS)
-                    fprintf('(%d) m/z %.4f \n',k,pixelMS(k,1)); 
-                 end
-                 ionIDX = input('Select m/z value index: ');
-                 tempMat = cell2mat(obj.featureList(n)); 
-                 tempTIC = cell2mat(obj.totIonCount{1});
-                 mzInt = tempMat(ionIDX,:);
-                 mzInt = mzInt'./tempTIC;
-                 mzInt = mzInt';
+              clc
+              pixelMS = cell2mat(obj.uniqueFeatures(iteration)); 
+              potentialIDX = find(pixelMS(:,1) > obj.mz-1 & pixelMS(:,1) < obj.mz+1);
+              for k = 1:length(potentialIDX)
+                 fprintf('(%d) m/z %.4f \n',potentialIDX(k),pixelMS(potentialIDX(k),1)); 
               end
+              ionIDX = input('Select m/z value index: ');
+              tempMat = cell2mat(obj.featureList(iteration)); 
+              tempTIC = cell2mat(obj.totIonCount{iteration});
+              mzInt = tempMat(ionIDX,:);
+              mzInt = mzInt'./tempTIC;
+              mzInt = mzInt';
            end
         end
         
         function setPlot(obj,j)
-              title(obj.files{j},'interpreter','none'); 
+              if isequal(obj.options.title,'true')
+                  try
+                      title(obj.files{j},'interpreter','none'); 
+                  catch
+                      title(obj.files,'interpreter','none'); 
+                  end
+              end
               xlabel(obj.XLabel);
               ylabel(obj.YLabel);          
               colorbar();
