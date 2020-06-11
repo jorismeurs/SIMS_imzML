@@ -52,19 +52,6 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
                return
            end
 
-           if isequal(obj.options.plotimages,'single')
-               spectralData = obj.spectra{obj.file};
-               fileTIC = cell2mat(obj.totIonCount{obj.file});
-               mzInt = constructImage(obj,spectralData,fileTIC);
-               reconstructedIntensities = reshape(mzInt,...
-                   obj.pixelRows,obj.pixelColumns);
-               colormap(obj.CMAP);
-               imagesc(reconstructedIntensities);
-               setPlot(obj);
-               if isequal(obj.options.saveimage,'true')
-                      
-               end
-           end
            if isequal(obj.options.plotimages,'all')
                for j = 1:length(obj.spectra)
                   spectralData = obj.spectra{j};
@@ -84,19 +71,8 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
            end
         end
         
-        function mzInt = constructImage(obj,MSData,TIC)
-           if isequal(obj.options.featureSelection,'profile')
-              mzInt = [];
-              for n = 1:length(MSData)
-                  pixelMS = cell2mat(MSData(n,1));
-                  ionIDX = find(pixelMS(:,1) > obj.mz-obj.options.tolerance & pixelMS(:,1) < obj.mz+obj.options.tolerance);
-                  if ~isempty(ionIDX)
-                     mzInt = [mzInt;max(pixelMS(ionIDX,2))/TIC(n,1)]; 
-                  else
-                     mzInt = [mzInt;0]; 
-                  end
-              end
-           end
+        function mzInt = constructImage(obj)
+
            if isequal(obj.options.featureSelection,'peaks')
               mzInt = []; 
               for n = 1:length(obj.uniqueFeatures)
@@ -116,11 +92,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
         end
         
         function setPlot(obj,j)
-              if nargin < 2
-                 title(obj.files,'interpreter','none');  
-              else
-                 title(obj.files{j},'interpreter','none'); 
-              end
+              title(obj.files{j},'interpreter','none'); 
               xlabel(obj.XLabel);
               ylabel(obj.YLabel);          
               colorbar();
