@@ -1,4 +1,4 @@
-classdef SIMSimzML < readimzML & customisePlot
+classdef SIMSimzML < readimzML & customisePlot & extractFeatures
     % Parsing .imzML files exported from Surface Lab for generating ion
     % images on mass spectrometry imaging data
     %
@@ -27,7 +27,9 @@ classdef SIMSimzML < readimzML & customisePlot
             obj.options.plotimages = 'all';
             obj.options.saveimage = 'true';
             obj.options.exportformat = 'tif';
-            obj.options.tolerance = 0.01;
+            obj.options.tolerance = 0.001;
+            obj.options.featureSelection = 'peaks';
+            obj.options.thresholdIntensity = 1000;
         end
         
         function obj = selectFile(obj)
@@ -53,48 +55,69 @@ classdef SIMSimzML < readimzML & customisePlot
            if isequal(obj.options.plotimages,'single')
                spectralData = obj.spectra{obj.file};
                fileTIC = cell2mat(obj.totIonCount{obj.file});
-               mzInt = [];
-               for j = 1:length(spectralData)
-                  pixelMS = cell2mat(spectralData(j,1)); 
-                  ionIDX = find(pixelMS(:,1) > obj.mz-0.001 & pixelMS(:,1) < obj.mz+0.001);
-                  if ~isempty(ionIDX)
-                     mzInt = [mzInt;sum(pixelMS(ionIDX,2))/fileTIC(j,1)]; 
-                  else
-                     mzInt = [mzInt;0]; 
-                  end
-               end
+               mzInt = constructImage(obj,spectralData,fileTIC);
                reconstructedIntensities = reshape(mzInt,...
                    obj.pixelRows,obj.pixelColumns);
                colormap(obj.CMAP);
                imagesc(reconstructedIntensities);
+               setPlot(obj);
+               if isequal(obj.options.saveimage,'true')
+                      
+               end
            end
            if isequal(obj.options.plotimages,'all')
                for j = 1:length(obj.spectra)
                   spectralData = obj.spectra{j};
                   fileTIC = cell2mat(obj.totIonCount{j});
-                  mzInt = [];
-                  for n = 1:length(spectralData)
-                      pixelMS = cell2mat(spectralData(n,1));
-                      ionIDX = find(pixelMS(:,1) > obj.mz-obj.options.tolerance & pixelMS(:,1) < obj.mz+obj.options.tolerance);
-                      if ~isempty(ionIDX)
-                         mzInt = [mzInt;sum(pixelMS(ionIDX,2))/fileTIC(j,1)]; 
-                      else
-                         mzInt = [mzInt;0]; 
-                      end
-                  end
+                  mzInt = constructImage(obj,spectralData,fileTIC);                
                   figure(j)
                   reconstructedIntensities = reshape(mzInt,...
                   obj.pixelRows,obj.pixelColumns);
                   colormap(obj.CMAP);
                   imagesc(reconstructedIntensities);
-                  setPlot(obj,j)                      
+                  drawnow;
+                  setPlot(obj,j)  
+                  if isequal(obj.options.saveimage,'true')
+                      
+                  end
                end
+           end
+        end
+        
+        function mzInt = constructImage(obj,MSData,TIC)
+           if isequal(obj.options.featureSelection,'profile')
+              mzInt = [];
+              for n = 1:length(MSData)
+                  pixelMS = cell2mat(MSData(n,1));
+                  ionIDX = find(pixelMS(:,1) > obj.mz-obj.options.tolerance & pixelMS(:,1) < obj.mz+obj.options.tolerance);
+                  if ~isempty(ionIDX)
+                     mzInt = [mzInt;max(pixelMS(ionIDX,2))/TIC(n,1)]; 
+                  else
+                     mzInt = [mzInt;0]; 
+                  end
+              end
+           end
+           if isequal(obj.options.featureSelection,'peaks')
+              mzInt = []; 
+              for n = 1:length(obj.uniqueFeatures)
+                 clc
+                 pixelMS = cell2mat(obj.uniqueFeatures(n)); 
+                 for k = 1:length(pixelMS)
+                    fprintf('(%d) m/z %.4f \n',k,pixelMS(k,1)); 
+                 end
+                 ionIDX = input('Select m/z value index: ');
+                 tempMat = cell2mat(obj.featureList(n)); 
+                 tempTIC = cell2mat(obj.totIonCount{1});
+                 mzInt = tempMat(ionIDX,:);
+                 mzInt = mzInt'./tempTIC;
+                 mzInt = mzInt';
+              end
            end
         end
         
         function setPlot(obj,j)
               if nargin < 2
-                 title(obj.files{obj.file},'interpreter','none');  
+                 title(obj.files,'interpreter','none');  
               else
                  title(obj.files{j},'interpreter','none'); 
               end
@@ -102,17 +125,19 @@ classdef SIMSimzML < readimzML & customisePlot
               ylabel(obj.YLabel);          
               colorbar();
               if ~isempty(obj.XTick)
-                  set(gca,'XTick',XTick);
+                  set(gca,'XTick',obj.XTick);
               end
               if ~isempty(obj.YTick)
-                  set(gca,'YTick',YTick);
+                  set(gca,'YTick',obj.YTick);
               end    
               if ~isempty(obj.XTickLabels)
-                 set(gca,'XTickLabels',num2str(XTickLabels)) 
+                 set(gca,'XTickLabels',obj.XTickLabels) 
               end
               if ~isempty(obj.YTickLabels)
-                  set(gca,'XTickLabels',num2str(XTickLabels))
+                  set(gca,'YTickLabels',obj.YTickLabels)
               end
+              set(gcf,'Color','white');
+              set(gca,'FontName',obj.fontName);
         end
     end
     
