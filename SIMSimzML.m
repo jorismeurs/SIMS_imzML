@@ -9,7 +9,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
     % - Statistics & Machine Learning Toolbox
     
     properties 
-        version = '0.0.8'
+        version = '0.0.9'
         developer = 'Joris Meurs, MSc'
         matlabVersion = 'R2017a'
         dependencies = {'Bioinformatics Toolbox'}
@@ -84,7 +84,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
               mzInt = []; 
               clc
               pixelMS = cell2mat(obj.uniqueFeatures(iteration)); 
-              potentialIDX = find(pixelMS(:,1) > obj.mz-1 & pixelMS(:,1) < obj.mz+1);
+              potentialIDX = find(pixelMS(:,1) > obj.mz-obj.options.tolerance & pixelMS(:,1) < obj.mz+obj.options.tolerance);
               for k = 1:length(potentialIDX)
                  fprintf('(%d) m/z %.4f \n',potentialIDX(k),pixelMS(potentialIDX(k),1)); 
               end
