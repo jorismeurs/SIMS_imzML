@@ -1,5 +1,7 @@
 # SIMS_imzML
-Processing SIMS imzML files exported from SurfaceLab
+Processing SIMS imzML files exported from SurfaceLab. imzML files are parsed into MATLAB using the imzML Converter [1]. Further requirements for processing is the Bioinformatics Toolbox
+
+[1] A. M. Race, I. B. Styles, J. Bunch, Inclusive sharing of mass spectrometry imaging data requires a converter for all. J. Proteomics 75, 5111–5112 (2012).
 
 ## Main functionality
 1. ```obj = SIMSimzML``` Initiate class with default values </br>
