@@ -4,8 +4,6 @@ classdef extractFeatures < readimzML
     properties
         featureList     
         uniqueFeatures
-        thresholdIntensity = 1000;
-        thresholdType = 'absolute';
     end
 
     properties (Access = private)        
@@ -24,7 +22,7 @@ classdef extractFeatures < readimzML
                for j = 1:length(tempList)
                    tempMS = cell2mat(tempList(j,1));
                    tempPeaks{j,1} = mspeaks(tempMS(:,1),tempMS(:,2),...
-                   'HeightFilter',obj.thresholdIntensity,...
+                   'HeightFilter',obj.options.thresholdIntensity,...
                    'Denoising',false);
                end  
                obj.peakList = tempPeaks;
@@ -42,7 +40,7 @@ classdef extractFeatures < readimzML
                    for n = 1:length(tempList)
                        tempMS = cell2mat(tempList(n,1));
                        tempPeaks{n,1} = mspeaks(tempMS(:,1),tempMS(:,2),...
-                       'HeightFilter',obj.thresholdIntensity,...
+                       'HeightFilter',obj.options.thresholdIntensity,...
                        'Denoising',false);
                    end
                    obj.peakList = tempPeaks;
@@ -55,23 +53,23 @@ classdef extractFeatures < readimzML
         end
 
         function obj = validateIntensityInput(obj)
-            if isequal(obj.thresholdType,'basepeak')
-                if obj.thresholdIntensity <= 0 || obj.thresholdIntensity >= 100
+            if isequal(obj.options.thresholdType,'basepeak')
+                if obj.options.thresholdIntensity <= 0 || obj.options.thresholdIntensity >= 100
                    error('Threshold intensity for type "basepeak" should be between 0 and 100'); 
                 end
-            elseif isequal(obj.thresholdType,'absolute')
-                if obj.thresholdIntensity < 0
+            elseif isequal(obj.options.thresholdType,'absolute')
+                if obj.options.thresholdIntensity < 0
                    error('Threshold intensity for type "absolute" should be 0 or larger'); 
                 end
-            elseif isequal(obj.thresholdType,'snr')
-                if obj.thresholdIntensity <= 0
+            elseif isequal(obj.options.thresholdType,'snr')
+                if obj.options.thresholdIntensity <= 0
                    error('Threshold intensity for type "snr" should be larger than 0'); 
                 end
             else
                error('Invalid input for threshold'); 
             end
-            fprintf('Threshold type:    %s \n',obj.thresholdType);
-            fprintf('Threshold value:   %s \n',num2str(obj.thresholdIntensity));
+            fprintf('Threshold type:    %s \n',obj.options.thresholdType);
+            fprintf('Threshold value:   %s \n',num2str(obj.options.thresholdIntensity));
         end
 
        function obj = getUniqueFeatures(obj,iteration)

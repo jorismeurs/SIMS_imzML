@@ -31,6 +31,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
             obj.options.featureSelection = 'peaks';
             obj.options.thresholdIntensity = 1000;
             obj.options.title = 'false';
+            obj.options.thresholdType = 'absolute';
         end
         
         function obj = selectFile(obj)
