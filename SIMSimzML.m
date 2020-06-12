@@ -96,6 +96,21 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
               mzInt = mzInt'./tempTIC;
               mzInt = mzInt';
            end
+           if isequal(obj.options.featureSelection,'profile')
+               fileSpectra = obj.spectra{iteration};
+               tempTIC = cell2mat(obj.totIonCount{iteration});
+               mzInt = zeros(length(fileSpectra),1);
+               for j = 1:length(fileSpectra)
+                   pixelMS = cell2mat(fileSpectra(j,1));
+                   ionIDX = find(pixelMS(:,1) > obj.mz-obj.options.tolerance & ...
+                       pixelMS(:,1) < obj.mz+obj.options.tolerance);
+                   if ~isempty(ionIDX)
+                       mzInt(j,1) = max(pixelMS(ionIDX,2));
+                   end
+               end
+               mzInt = mzInt./tempTIC;
+               mzInt = mzInt';
+           end
         end
         
         function setPlot(obj,j)
