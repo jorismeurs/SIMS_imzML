@@ -19,6 +19,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
        options
        file
        mz
+       averageIntensity
     end
     
     methods
@@ -105,10 +106,11 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
                    ionIDX = find(pixelMS(:,1) > obj.mz-obj.options.tolerance & ...
                        pixelMS(:,1) < obj.mz+obj.options.tolerance);
                    if ~isempty(ionIDX)
-                       mzInt(j,1) = max(pixelMS(ionIDX,2));
+                       mzInt(j,1) = sum(pixelMS(ionIDX,2));
                    end
                end
                mzInt = mzInt./tempTIC;
+               obj.averageIntensity = mean(mzInt);
                mzInt = mzInt';
            end
         end
