@@ -19,7 +19,6 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
        options
        file
        mz
-       averageIntensity
     end
     
     methods
@@ -52,7 +51,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
 
            if isequal(obj.options.plotimages,'all')
                for j = 1:length(obj.files)
-                  mzInt = constructImage(obj,j);                
+                  mzInt = constructImage(obj,j); 
                   f = figure;
                   reconstructedIntensities = reshape(mzInt,...
                   obj.pixelRows,obj.pixelColumns);
@@ -77,7 +76,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
            end
         end
         
-        function mzInt = constructImage(obj,iteration)
+        function [mzInt,obj] = constructImage(obj,iteration)
            if isempty(obj.mz)
                warning('No m/z value input');
                return
@@ -110,7 +109,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
                    end
                end
                mzInt = mzInt./tempTIC;
-               obj.averageIntensity = mean(mzInt);
+               disp(mean(mzInt));
                mzInt = mzInt';
            end
         end
