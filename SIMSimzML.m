@@ -9,7 +9,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
     % - Statistics & Machine Learning Toolbox
     
     properties 
-        version = '0.0.9'
+        version = '0.1.1'
         developer = 'Joris Meurs, MSc'
         matlabVersion = 'R2017a'
         dependencies = {'Bioinformatics Toolbox'}
