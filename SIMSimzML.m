@@ -19,6 +19,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
        options
        file
        mz
+       intensityData
     end
     
     methods
@@ -52,6 +53,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
            if isequal(obj.options.plotimages,'all')
                for j = 1:length(obj.files)
                   mzInt = constructImage(obj,j); 
+                  obj.intensityData{j} = mzInt;
                   f = figure;
                   reconstructedIntensities = reshape(mzInt,...
                   obj.pixelRows,obj.pixelColumns);
