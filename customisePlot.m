@@ -13,6 +13,7 @@ classdef customisePlot
         YTickLabels
         CMAPval = 'hot'
         fontName = 'Calibri'
+        fontSize = 14;
     end
     
     methods

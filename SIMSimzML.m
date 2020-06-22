@@ -140,7 +140,8 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
                   set(gca,'YTickLabels',obj.YTickLabels)
               end
               set(gcf,'Color','white');
-              set(gca,'FontName',obj.fontName);
+              set(gca,'FontName',obj.fontName,...
+                  'FontSize',obj.fontSize);
         end
         
         function obj = ticImage(obj)
