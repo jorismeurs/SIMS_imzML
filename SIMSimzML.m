@@ -9,7 +9,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
     % - Statistics & Machine Learning Toolbox
     
     properties 
-        version = '0.1.1'
+        version = '0.2.0'
         developer = 'Joris Meurs, MSc'
         matlabVersion = 'R2017a'
         dependencies = {'Bioinformatics Toolbox'}
@@ -141,6 +141,30 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
               end
               set(gcf,'Color','white');
               set(gca,'FontName',obj.fontName);
+        end
+        
+        function obj = ticImage(obj)
+              for j = 1:length(obj.totIonCount)
+                  tempTIC = cell2mat(obj.totIonCount{j});
+                  tempTIC = reshape(tempTIC,obj.pixelRows,obj.pixelColumns);
+                  f = figure;
+                  colormap(obj.CMAP);
+                  imagesc(tempTIC);
+                  setPlot(obj,j);
+                  if isequal(obj.options.saveimage,'true')
+                      currentFolder = cd;
+                      exportFolder = [cd '\images\'];
+                      if ~exist(exportFolder,'dir')
+                         mkdir images
+                      end
+                      try
+                        saveas(f,[currentFolder '\images\TIC_' obj.files{j} '.tif']);
+                      catch
+                        saveas(f,[currentFolder '\images\TIC_' obj.files '.tif']);  
+                      end
+                  end
+                  close(f);
+              end
         end
     end
     
