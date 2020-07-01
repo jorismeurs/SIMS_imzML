@@ -9,13 +9,14 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
     % - Statistics & Machine Learning Toolbox
     
     properties 
-        version = '0.2.0'
+        version = '0.2.1'
         developer = 'Joris Meurs, MSc'
         matlabVersion = 'R2017a'
         dependencies = {'Bioinformatics Toolbox'}
     end
     
     properties
+       heterogeneityData
        options
        file
        mz
@@ -166,6 +167,26 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
                   end
                   close(f);
               end
+        end
+        
+        function obj = imageHeterogeneity(obj)
+           obj.heterogeneityData = []; 
+           for n = 1:length(obj.spectra) 
+               fileSpectra = obj.spectra{n};
+               tempTIC = cell2mat(obj.totIonCount{n});
+               mzInt = zeros(length(fileSpectra),1);
+               for j = 1:length(fileSpectra)
+                   pixelMS = cell2mat(fileSpectra(j,1));
+                   ionIDX = find(pixelMS(:,1) > obj.mz-obj.options.tolerance & ...
+                       pixelMS(:,1) < obj.mz+obj.options.tolerance);
+                   if ~isempty(ionIDX)
+                       mzInt(j,1) = sum(pixelMS(ionIDX,2));
+                   end
+               end
+               mzInt = mzInt./tempTIC;
+               %mzInt(mzInt==0) = NaN;
+               obj.heterogeneityData = [obj.heterogeneityData;ones(length(mzInt),1).*n,mzInt];
+           end
         end
     end
     
