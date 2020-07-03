@@ -14,6 +14,9 @@ classdef customisePlot
         CMAPval = 'hot'
         fontName = 'Calibri'
         fontSize = 14;
+        colorbarMin
+        colorbarMax
+        colorbarPercentage
     end
     
     methods
@@ -22,6 +25,16 @@ classdef customisePlot
                 obj.CMAP = hot();
             elseif isequal(obj.CMAPval,'cividis')
                 tempCM = cividis();
+                obj.CMAP = tempCM;
+            elseif isequal(obj.CMAPval,'whiteblue')
+                startColor = [255,255,255];
+                endColor = [5,112,176];
+                startColor = startColor./255;
+                endColor = endColor./255;
+                r = linspace(startColor(1),endColor(1),20);
+                g = linspace(startColor(2),endColor(2),20);
+                b = linspace(startColor(3),endColor(3),20);
+                tempCM = [r',g',b'];
                 obj.CMAP = tempCM;
             else
                error('Color map not supported'); 

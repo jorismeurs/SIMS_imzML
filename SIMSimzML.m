@@ -112,7 +112,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
                    end
                end
                mzInt = mzInt./tempTIC;
-               disp(mean(mzInt));
+               %disp(mean(mzInt));
                mzInt = mzInt';
            end
         end
@@ -139,6 +139,9 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
               end
               if ~isempty(obj.YTickLabels)
                   set(gca,'YTickLabels',obj.YTickLabels)
+              end
+              if ~isempty(obj.colorbarMin) && ~isempty(obj.colorbarMax)
+                 caxis(gca,[obj.colorbarMin obj.colorbarMax]) 
               end
               set(gcf,'Color','white');
               set(gca,'FontName',obj.fontName,...
@@ -185,7 +188,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
                end
                mzInt = mzInt./tempTIC;
                %mzInt(mzInt==0) = NaN;
-               obj.heterogeneityData = [obj.heterogeneityData;ones(length(mzInt),1).*n,mzInt];
+               obj.heterogeneityData = [obj.heterogeneityData;ones(length(mzInt),1).*(n+21),mzInt];
            end
         end
     end
