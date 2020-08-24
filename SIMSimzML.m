@@ -9,7 +9,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
     % - Statistics & Machine Learning Toolbox
     
     properties 
-        version = '0.2.1'
+        version = '0.2.2'
         developer = 'Joris Meurs, MSc'
         matlabVersion = 'R2017a'
         dependencies = {'Bioinformatics Toolbox'}
@@ -188,7 +188,7 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
                end
                mzInt = mzInt./tempTIC;
                %mzInt(mzInt==0) = NaN;
-               obj.heterogeneityData = [obj.heterogeneityData;ones(length(mzInt),1).*(n+21),mzInt];
+               obj.heterogeneityData = [obj.heterogeneityData;ones(length(mzInt),1).*(21+n),mzInt];
            end
         end
     end
