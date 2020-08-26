@@ -187,8 +187,22 @@ classdef SIMSimzML < readimzML & customisePlot & extractFeatures
                    end
                end
                mzInt = mzInt./tempTIC;
-               %mzInt(mzInt==0) = NaN;
-               obj.heterogeneityData = [obj.heterogeneityData;ones(length(mzInt),1).*(21+n),mzInt];
+               mzInt(mzInt==0) = NaN;
+               obj.heterogeneityData = [obj.heterogeneityData;ones(length(mzInt),1).*n,mzInt];
+           end
+        end
+        
+        function obj = ticHeterogeneity(obj)
+           obj.heterogeneityData = [];
+           for n = 1:length(obj.spectra) 
+               fileSpectra = obj.spectra{n};
+               totIonCurrent = zeros(length(fileSpectra),1);
+               for j = 1:length(fileSpectra)
+                   pixelMS = cell2mat(fileSpectra(j,1));
+                   totIonCurrent(j,1) = sum(pixelMS(:,2));
+               end              
+               totIonCurrent(totIonCurrent==0) = NaN;
+               obj.heterogeneityData = [obj.heterogeneityData;ones(length(totIonCurrent),1).*n,totIonCurrent];
            end
         end
     end
