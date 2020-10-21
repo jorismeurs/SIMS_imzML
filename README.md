@@ -34,3 +34,5 @@ default, images will saved. Type ```obj.options.saveimage = 'false'``` if export
 - Change colormap:            ```obj.CMAPval``` 
   - Options:                  ```hot``` or ```cividis```
   - Run ```obj = obj.setCMAP```
+
+## License
