@@ -3,6 +3,13 @@ Processing SIMS imzML files exported from SurfaceLab. imzML files are parsed int
 
 [1] A. M. Race, I. B. Styles, J. Bunch, Inclusive sharing of mass spectrometry imaging data requires a converter for all. J. Proteomics 75, 5111–5112 (2012).
 
+## Requirements & dependencies
+Developed and tested in MATLAB R2017a on Windows 10 </br>
+Toolboxes to be installed with MATLAB: </br>
+- Signal Processing Toolbox
+- Bioinformatics Toolbox
+- Statistics & Machine Learning Toolbox
+
 ## Main functionality
 1. ```obj = SIMSimzML``` Initiate class with default values </br>
 2. ```obj = obj.locateFiles``` Locate the imzML Converter .jar file ```imzMLConverter.jar``` followed by the .imzML files of interest </br>
@@ -36,3 +43,4 @@ default, images will saved. Type ```obj.options.saveimage = 'false'``` if export
   - Run ```obj = obj.setCMAP```
 
 ## License
+MIT License
